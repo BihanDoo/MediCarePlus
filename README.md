@@ -17,7 +17,7 @@ sudo apt install git
 
 open intellij idea and click "cone repository"
 put this url and clone.
-https://github.com/BihanDoo/Medicare.git
+https://github.com/BihanDoo/MediCarePlus.git
 
 
 
