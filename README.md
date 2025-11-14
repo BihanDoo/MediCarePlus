@@ -1,8 +1,8 @@
 
 
-how to setup git?
+how to set up git?
 open intellij idea on ubuntu
-login to your github account
+login to your GitHub account
 
 
 initial setup in intellij(to prevent from losing credentials)
