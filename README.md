@@ -4,6 +4,10 @@ how to setup git?
 open intellij idea on ubuntu
 login to your github account
 
+initial setup in intellij
+Ctrl+alt+S, under version control-->git
+scroll down and select "use credential helper"
+
 open terminal (Alt + F12)
 type the following lines separately (one after the another) and hit enter
 sudo apt update
