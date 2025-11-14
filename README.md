@@ -4,7 +4,8 @@ how to setup git?
 open intellij idea on ubuntu
 login to your github account
 
-initial setup in intellij
+
+initial setup in intellij(to prevent from losing credentials)
 Ctrl+alt+S, under version control-->git
 scroll down and select "use credential helper"
 
