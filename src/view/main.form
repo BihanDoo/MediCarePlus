@@ -16,7 +16,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="ddafb" class="javax.swing.JButton" binding="assignDoctorsToPatientsButton" default-binding="true">
+          <component id="ddafb" class="javax.swing.JButton" binding="AssignDocBtn">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -32,7 +32,7 @@
               <text value="Generate Monthly reports"/>
             </properties>
           </component>
-          <component id="be940" class="javax.swing.JButton" binding="sendNotificationsToPatientsButton" default-binding="true">
+          <component id="be940" class="javax.swing.JButton" binding="sendNotificPatBtn">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -40,7 +40,7 @@
               <text value="Send Notifications to Patients"/>
             </properties>
           </component>
-          <component id="4b56a" class="javax.swing.JButton" binding="sendNotificationsToDoctorsButton" default-binding="true">
+          <component id="4b56a" class="javax.swing.JButton" binding="sendNotificDocBtn">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -95,7 +95,7 @@
                   <grid row="1" column="0" row-span="3" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
                 </constraints>
               </vspacer>
-              <component id="adc83" class="javax.swing.JButton" binding="addButton" default-binding="true">
+              <component id="adc83" class="javax.swing.JButton" binding="patientAddBtn">
                 <constraints>
                   <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -103,7 +103,7 @@
                   <text value="Add"/>
                 </properties>
               </component>
-              <component id="87581" class="javax.swing.JButton" binding="removeButton" default-binding="true">
+              <component id="87581" class="javax.swing.JButton" binding="patientRemoveButton">
                 <constraints>
                   <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -111,7 +111,7 @@
                   <text value="Remove"/>
                 </properties>
               </component>
-              <component id="869a6" class="javax.swing.JButton" binding="updateButton" default-binding="true">
+              <component id="869a6" class="javax.swing.JButton" binding="patientUpdtBtn">
                 <constraints>
                   <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -137,7 +137,7 @@
                   <text value="Doctors Management"/>
                 </properties>
               </component>
-              <component id="8d6b" class="javax.swing.JButton" binding="updateButton1" default-binding="true">
+              <component id="8d6b" class="javax.swing.JButton" binding="DocUpdtBtn">
                 <constraints>
                   <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -145,7 +145,7 @@
                   <text value="Update"/>
                 </properties>
               </component>
-              <component id="6b604" class="javax.swing.JButton" binding="addButton2" default-binding="true">
+              <component id="6b604" class="javax.swing.JButton" binding="DocAddBtn">
                 <constraints>
                   <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -153,7 +153,7 @@
                   <text value="Add"/>
                 </properties>
               </component>
-              <component id="dedbe" class="javax.swing.JButton" binding="removeButton2" default-binding="true">
+              <component id="dedbe" class="javax.swing.JButton" binding="DocRemvBtn">
                 <constraints>
                   <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>

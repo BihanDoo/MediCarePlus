@@ -1,9 +1,11 @@
 package view;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class AddPatients extends JFrame{
-    private JComboBox comboBox1;
+    public JComboBox comboBox1;
     private JPanel AddPatientsPane;
     private JTextField textField1;
     private JTextField textField2;
@@ -16,14 +18,21 @@ public class AddPatients extends JFrame{
     AddPatients(){
         setContentPane(AddPatientsPane);
         setTitle("Add/Update Patients");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
         setSize(600,550);
         setLocationRelativeTo(null);
         setVisible(true);
+        comboBox1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
+            }
+        });
     }
 
     static void main() {
         new AddPatients();
     }
+
+
 }
