@@ -1,7 +1,6 @@
 package model;
 
 public class Patient {
-    // Private fields (patient attributes)
     private int patientId;
     private String name;
     private String dateOfBirth; // Format: YYYY-MM-DD
@@ -11,7 +10,7 @@ public class Patient {
     private String address;
     private String medicalHistory;
 
-    // Constructor - used when creating a new Patient object
+    // Constructor
     public Patient(int patientId, String name, String dateOfBirth, String gender,
                    String phoneNumber, String email, String address, String medicalHistory) {
         this.patientId = patientId;
@@ -24,9 +23,8 @@ public class Patient {
         this.medicalHistory = medicalHistory;
     }
 
-    // Default constructor (optional)
+    // Default
     public Patient() {
-        // Empty constructor for flexibility
     }
 
     // Getter and Setter methods for each field
@@ -103,7 +101,6 @@ public class Patient {
         this.medicalHistory = medicalHistory;
     }
 
-    // toString method - useful for displaying patient info
     @Override
     public String toString() {
         return "Patient ID: " + patientId + " | Name: " + name + " | Phone: " + phoneNumber;
