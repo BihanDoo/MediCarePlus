@@ -14,6 +14,8 @@ public class Manage_Doctors extends JFrame {
         setVisible(true);
     }
 
+
+
     static void main() {
 
     }
