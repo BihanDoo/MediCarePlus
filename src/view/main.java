@@ -3,6 +3,8 @@ package view;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import view.PatientManagementForm;
+
 
 public class main extends JFrame {
 
@@ -27,23 +29,10 @@ public class main extends JFrame {
         setSize(600,550);
         setLocationRelativeTo(null);
         setVisible(true);
-        patientAddBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AddPatients().setVisible(true);
-            }
-        });
-        patientUpdtBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AddPatients().setVisible(true);
-            }
-        });
-        patientRemoveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AddPatients().setVisible(true);
-            }
+        JButton patientButton = new JButton("Patients Management");
+        patientButton.addActionListener(e -> {
+            PatientManagementForm patientForm = new PatientManagementForm();
+            patientForm.setVisible(true);
         });
         DocAddBtn.addActionListener(new ActionListener() {
             @Override
