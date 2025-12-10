@@ -2,10 +2,10 @@ package view;
 
 import javax.swing.*;
 
-public class SendNotifications extends JFrame {
+public class SendNotificationsToPatients extends JFrame {
     private JPanel SendNotificationsPane;
 
-    SendNotifications(){
+    SendNotificationsToPatients(){
         setContentPane(SendNotificationsPane);
         setTitle("Send Notifications");
         setDefaultCloseOperation(HIDE_ON_CLOSE);

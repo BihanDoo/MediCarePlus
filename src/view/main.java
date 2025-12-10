@@ -90,13 +90,13 @@ public class main extends JFrame {
         sendNotificPatBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SendNotifications().setVisible(true);
+                new SendNotificationsToPatients().setVisible(true);
             }
         });
         sendNotificDocBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SendNotifications().setVisible(true);
+                new SendNotificationsToPatients().setVisible(true);
             }
         });
     }
