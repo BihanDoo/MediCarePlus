@@ -260,6 +260,7 @@ public class PatientManagementForm extends JFrame {
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to delete patient!",
                         "Error", JOptionPane.ERROR_MESSAGE);
+
             }
         }
     }
