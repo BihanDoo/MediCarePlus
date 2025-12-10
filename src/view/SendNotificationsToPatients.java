@@ -14,6 +14,7 @@ public class SendNotificationsToPatients extends JFrame {
         setVisible(true);
     }
 
+
     static void main() {
 
     }
