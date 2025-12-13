@@ -1,121 +1,79 @@
 package view;
 
-import DataBase.PatientDatabase;
-import model.Patient;
+import DataBase.database;
+import org.bson.Document;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
 
 public class PatientManagementForm extends JFrame {
-    private PatientDatabase patientDB;
 
-    // Form components
-    private JTextField txtId, txtName, txtDob, txtGender, txtPhone, txtEmail, txtAddress;
-    private JTextArea txtMedicalHistory;
-    private JButton btnAdd, btnUpdate, btnDelete, btnClear, btnSearch, btnRefresh;
+    private JTextField txtName, txtAge, txtGender, txtDisease;
+    private JButton btnAdd, btnUpdate, btnDelete, btnClear, btnRefresh;
     private JTable patientTable;
     private DefaultTableModel tableModel;
 
     public PatientManagementForm() {
-        patientDB = new PatientDatabase();
-
-        // Setup window
-        setTitle("Patient Management - MediCare Plus");
-        setSize(900, 600);
+        setTitle("Patient Management");
+        setSize(900, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
         // Create panels
-        JPanel leftPanel = createFormPanel();
-        JPanel rightPanel = createTablePanel();
-        JPanel buttonPanel = createButtonPanel();
+        add(createFormPanel(), BorderLayout.WEST);
+        add(createTablePanel(), BorderLayout.CENTER);
+        add(createButtonPanel(), BorderLayout.SOUTH);
 
-        // Add panels to frame
-        add(leftPanel, BorderLayout.WEST);
-        add(rightPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
-
-        // Load initial data
+        // Load data on startup
         refreshTable();
 
-        // Center window on screen
         setLocationRelativeTo(null);
     }
 
     private JPanel createFormPanel() {
-        JPanel panel = new JPanel(new GridLayout(9, 2, 10, 10));
-        panel.setBorder(BorderFactory.createTitledBorder("Patient Details"));
-        panel.setPreferredSize(new Dimension(350, 500));
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        panel.setBorder(BorderFactory.createTitledBorder("Add/Edit Patient"));
+        panel.setPreferredSize(new Dimension(300, 250));
 
-        // ID field (read-only for auto-generated)
-        panel.add(new JLabel("Patient ID:"));
-        txtId = new JTextField();
-        txtId.setEditable(false);
-        txtId.setText("Auto-generated");
-        panel.add(txtId);
-
-        // Name
-        panel.add(new JLabel("Full Name*:"));
+        panel.add(new JLabel("Name:"));
         txtName = new JTextField();
         panel.add(txtName);
 
-        // Date of Birth
-        panel.add(new JLabel("Date of Birth (YYYY-MM-DD):"));
-        txtDob = new JTextField();
-        panel.add(txtDob);
+        panel.add(new JLabel("Age:"));
+        txtAge = new JTextField();
+        panel.add(txtAge);
 
-        // Gender
         panel.add(new JLabel("Gender:"));
         txtGender = new JTextField();
         panel.add(txtGender);
 
-        // Phone
-        panel.add(new JLabel("Phone Number:"));
-        txtPhone = new JTextField();
-        panel.add(txtPhone);
-
-        // Email
-        panel.add(new JLabel("Email:"));
-        txtEmail = new JTextField();
-        panel.add(txtEmail);
-
-        // Address
-        panel.add(new JLabel("Address:"));
-        txtAddress = new JTextField();
-        panel.add(txtAddress);
-
-        // Medical History (bigger area)
-        panel.add(new JLabel("Medical History:"));
-        JScrollPane scrollPane = new JScrollPane();
-        txtMedicalHistory = new JTextArea(3, 20);
-        scrollPane.setViewportView(txtMedicalHistory);
-        panel.add(scrollPane);
+        panel.add(new JLabel("Disease:"));
+        txtDisease = new JTextField();
+        panel.add(txtDisease);
 
         return panel;
     }
 
     private JPanel createTablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Patient List"));
+        panel.setBorder(BorderFactory.createTitledBorder("Patients List"));
 
-        // Create table
-        String[] columns = {"ID", "Name", "Phone", "Email", "Gender"};
+        String[] columns = {"Patient ID", "Name", "Age", "Gender", "Disease"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make table non-editable
+                return false; // Make table read-only
             }
         };
 
         patientTable = new JTable(tableModel);
         patientTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Add row selection listener
+        // When row is selected, load data into form
         patientTable.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
+            if (!e.getValueIsAdjusting() && patientTable.getSelectedRow() >= 0) {
                 loadSelectedPatient();
             }
         });
@@ -129,56 +87,26 @@ public class PatientManagementForm extends JFrame {
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
-        btnAdd = new JButton("Add New Patient");
+        btnAdd = new JButton("Add Patient");
         btnUpdate = new JButton("Update Patient");
         btnDelete = new JButton("Delete Patient");
         btnClear = new JButton("Clear Form");
-        btnSearch = new JButton("Search");
-        btnRefresh = new JButton("Refresh List");
+        btnRefresh = new JButton("Refresh Table");
 
-        // Set button colors
+        // Button actions
+        btnAdd.addActionListener(this::addPatient);
+        btnUpdate.addActionListener(this::updatePatient);
+        btnDelete.addActionListener(this::deletePatient);
+        btnClear.addActionListener(e -> clearForm());
+        btnRefresh.addActionListener(e -> refreshTable());
+
+        // Colors
         btnAdd.setBackground(new Color(76, 175, 80));
         btnAdd.setForeground(Color.WHITE);
         btnUpdate.setBackground(new Color(33, 150, 243));
         btnUpdate.setForeground(Color.WHITE);
         btnDelete.setBackground(new Color(244, 67, 54));
         btnDelete.setForeground(Color.WHITE);
-
-        // Add action listeners
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addPatient();
-            }
-        });
-
-        btnUpdate.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updatePatient();
-            }
-        });
-
-        btnDelete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                deletePatient();
-            }
-        });
-
-        btnClear.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearForm();
-            }
-        });
-
-        btnRefresh.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                refreshTable();
-            }
-        });
 
         panel.add(btnAdd);
         panel.add(btnUpdate);
@@ -189,173 +117,138 @@ public class PatientManagementForm extends JFrame {
         return panel;
     }
 
-    // ========== ACTION METHODS ==========
+    // ========== CORE METHODS ==========
 
-    private void addPatient() {
-        if (!validateForm()) return;
+    private void addPatient(ActionEvent e) {
+        try {
+            String name = txtName.getText().trim();
+            int age = Integer.parseInt(txtAge.getText().trim());
+            String gender = txtGender.getText().trim();
+            String disease = txtDisease.getText().trim();
 
-        Patient patient = createPatientFromForm();
-        boolean success = patientDB.addPatient(patient);
+            if (name.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Name is required!");
+                return;
+            }
 
-        if (success) {
-            JOptionPane.showMessageDialog(this, "Patient added successfully!",
-                    "Success", JOptionPane.INFORMATION_MESSAGE);
+            // Call your MongoDB method
+            database.addPatient(name, age, gender, disease);
+            JOptionPane.showMessageDialog(this, "Patient added successfully!");
+
             refreshTable();
             clearForm();
-        } else {
-            JOptionPane.showMessageDialog(this, "Failed to add patient!",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Age must be a number!");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
 
-    private void updatePatient() {
-        int selectedRow = patientTable.getSelectedRow();
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a patient to update!",
-                    "Warning", JOptionPane.WARNING_MESSAGE);
+    private void updatePatient(ActionEvent e) {
+        int row = patientTable.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a patient from the table first!");
             return;
         }
 
-        if (!validateForm()) return;
+        try {
+            String patientId = (String) tableModel.getValueAt(row, 0);
+            String name = txtName.getText().trim();
+            int age = Integer.parseInt(txtAge.getText().trim());
+            String gender = txtGender.getText().trim();
+            String disease = txtDisease.getText().trim();
 
-        int patientId = (int) tableModel.getValueAt(selectedRow, 0);
-        Patient patient = createPatientFromForm();
-        patient.setPatientId(patientId);
+            // Call your MongoDB method
+            database.updatePatient(patientId, name, age, gender, disease);
+            JOptionPane.showMessageDialog(this, "Patient updated successfully!");
 
-        boolean success = patientDB.updatePatient(patient);
-
-        if (success) {
-            JOptionPane.showMessageDialog(this, "Patient updated successfully!",
-                    "Success", JOptionPane.INFORMATION_MESSAGE);
             refreshTable();
             clearForm();
-        } else {
-            JOptionPane.showMessageDialog(this, "Failed to update patient!",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Age must be a number!");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }
 
-    private void deletePatient() {
-        int selectedRow = patientTable.getSelectedRow();
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a patient to delete!",
-                    "Warning", JOptionPane.WARNING_MESSAGE);
+    private void deletePatient(ActionEvent e) {
+        int row = patientTable.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a patient from the table first!");
             return;
         }
 
-        int patientId = (int) tableModel.getValueAt(selectedRow, 0);
-        String patientName = (String) tableModel.getValueAt(selectedRow, 1);
+        String patientId = (String) tableModel.getValueAt(row, 0);
+        String patientName = (String) tableModel.getValueAt(row, 1);
 
         int confirm = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to delete patient:\n" + patientName + " (ID: " + patientId + ")?",
+                "Are you sure you want to delete:\n" + patientName + " (ID: " + patientId + ")?",
                 "Confirm Delete", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            boolean success = patientDB.deletePatient(patientId);
-            if (success) {
-                JOptionPane.showMessageDialog(this, "Patient deleted successfully!",
-                        "Success", JOptionPane.INFORMATION_MESSAGE);
-                refreshTable();
-                clearForm();
-            } else {
-                JOptionPane.showMessageDialog(this, "Failed to delete patient!",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+            // Call your MongoDB method
+            database.deletePatient(patientId);
+            JOptionPane.showMessageDialog(this, "Patient deleted successfully!");
 
-            }
+            refreshTable();
+            clearForm();
         }
     }
 
     private void loadSelectedPatient() {
-        int selectedRow = patientTable.getSelectedRow();
-        if (selectedRow == -1) return;
+        int row = patientTable.getSelectedRow();
+        if (row == -1) return;
 
-        int patientId = (int) tableModel.getValueAt(selectedRow, 0);
-        Patient patient = patientDB.getPatientById(patientId);
-
-        if (patient != null) {
-            txtId.setText(String.valueOf(patient.getPatientId()));
-            txtName.setText(patient.getName());
-            txtDob.setText(patient.getDateOfBirth());
-            txtGender.setText(patient.getGender());
-            txtPhone.setText(patient.getPhoneNumber());
-            txtEmail.setText(patient.getEmail());
-            txtAddress.setText(patient.getAddress());
-            txtMedicalHistory.setText(patient.getMedicalHistory());
-        }
+        txtName.setText((String) tableModel.getValueAt(row, 1));
+        txtAge.setText(tableModel.getValueAt(row, 2).toString());
+        txtGender.setText((String) tableModel.getValueAt(row, 3));
+        txtDisease.setText((String) tableModel.getValueAt(row, 4));
     }
 
     private void refreshTable() {
-        // Clear table
-        tableModel.setRowCount(0);
+        try {
+            // Clear table
+            tableModel.setRowCount(0);
 
-        // Get all patients
-        List<Patient> patients = patientDB.getAllPatients();
+            // Get all patients from MongoDB using YOUR method
+            List<Document> patients = database.getAllPatients();
 
-        // Add to table
-        for (Patient patient : patients) {
-            Object[] row = {
-                    patient.getPatientId(),
-                    patient.getName(),
-                    patient.getPhoneNumber(),
-                    patient.getEmail(),
-                    patient.getGender()
-            };
-            tableModel.addRow(row);
+            // Add to table
+            for (Document patient : patients) {
+                Object[] row = {
+                        patient.getString("patientId"),
+                        patient.getString("name"),
+                        patient.getInteger("age"),
+                        patient.getString("gender"),
+                        patient.getString("disease")
+                };
+                tableModel.addRow(row);
+            }
+
+            // Show count in title
+            setTitle("Patient Management - " + patients.size() + " patients");
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Error loading patients: " + e.getMessage(),
+                    "Database Error", JOptionPane.ERROR_MESSAGE);
         }
-
-        // Update status
-        setTitle("Patient Management - " + patients.size() + " patients");
     }
 
     private void clearForm() {
-        txtId.setText("Auto-generated");
         txtName.setText("");
-        txtDob.setText("");
+        txtAge.setText("");
         txtGender.setText("");
-        txtPhone.setText("");
-        txtEmail.setText("");
-        txtAddress.setText("");
-        txtMedicalHistory.setText("");
+        txtDisease.setText("");
         patientTable.clearSelection();
     }
 
-    private Patient createPatientFromForm() {
-        return new Patient(
-                0, // ID will be set by database
-                txtName.getText().trim(),
-                txtDob.getText().trim(),
-                txtGender.getText().trim(),
-                txtPhone.getText().trim(),
-                txtEmail.getText().trim(),
-                txtAddress.getText().trim(),
-                txtMedicalHistory.getText().trim()
-        );
-    }
-
-    private boolean validateForm() {
-        if (txtName.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Patient name is required!",
-                    "Validation Error", JOptionPane.WARNING_MESSAGE);
-            txtName.requestFocus();
-            return false;
-        }
-        return true;
-    }
-
-    // Main method to run the form
+    // Main method to test
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                PatientManagementForm form = new PatientManagementForm();
-                form.setVisible(true);
-            }
+        SwingUtilities.invokeLater(() -> {
+            new PatientManagementForm().setVisible(true);
         });
     }
 }
