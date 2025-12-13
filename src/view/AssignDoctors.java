@@ -4,29 +4,6 @@ import javax.swing.*;
 import java.time.LocalDate;
 import DataBase.database;
 
-/*
-
-here is the code now. can you pls refine the code to get all the available time slots of the doctors and load them to the comboBox? show me where to change
-do not assume the code, just feel free to ask any question
-FYI here is what the DB looks like.
-
-
-List<String> slots = DB.getAvailableTimeSlots("D001");
-
-if (slots.isEmpty()) {
-    System.out.println("No available time slots.");
-} else {
-    System.out.println("Available Time Slots:");
-    for (String slot : slots) {
-        System.out.println("- " + slot);
-    }
-}
-
-
-
-*/
-
-
 public class AssignDoctors extends JFrame {
     private JPanel assignDocPane;
     private JList AvailableList;
