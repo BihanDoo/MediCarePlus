@@ -923,6 +923,21 @@ public class database {
 
 
 
+    public static List<Document> getAllDoctors() {
+
+        List<Document> doctorsList = new ArrayList<>();
+
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> doctors = db.getCollection(DOCTORS_COL);
+
+            doctors.find().into(doctorsList);
+        }
+
+        return doctorsList;
+    }
+
 
 
 }
