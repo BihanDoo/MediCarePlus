@@ -108,6 +108,7 @@ public class PatientManagementForm extends JFrame {
         btnDelete.setBackground(new Color(244, 67, 54));
         btnDelete.setForeground(Color.WHITE);
 
+
         panel.add(btnAdd);
         panel.add(btnUpdate);
         panel.add(btnDelete);

@@ -143,11 +143,11 @@ public class DoctorManagementForm extends JFrame {
 
         // Colors
         btnAdd.setBackground(new Color(76, 175, 80));
-        btnAdd.setForeground(Color.WHITE);
+        btnAdd.setForeground(Color.BLACK);
         btnUpdate.setBackground(new Color(33, 150, 243));
-        btnUpdate.setForeground(Color.WHITE);
+        btnUpdate.setForeground(Color.BLACK);
         btnDelete.setBackground(new Color(244, 67, 54));
-        btnDelete.setForeground(Color.WHITE);
+        btnDelete.setForeground(Color.BLACK);
         btnRefresh.setBackground(new Color(255, 193, 7));
         btnRefresh.setForeground(Color.BLACK);
 
