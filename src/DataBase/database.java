@@ -57,16 +57,18 @@ public class database {
                 )
         );*/
 //deleteDoctor("D001");
-
 /*
+
         scheduleAppointment(
                 "P001",
                 "D001",
+                LocalDate.now(),          // today
                 "Monday 09:00-11:00",
                 "General checkup"
         );
-
 */
+
+
 
 
 
@@ -89,13 +91,20 @@ public class database {
 */
 
 
-        //assignDoctor("P001", "General Physician", "Monday 09:00-11:00", "Fever and headache");
+/*
+        assignDoctor(
+                "P001",
+                "General Physician",
+                LocalDate.of(2025, 1, 15), // future date
+                "Wednesday 14:00-16:00",
+                "Fever"
+        );
 
 
+*/
 
 
-
-
+/*
         Document report = generateReportThisMonth();
 
         if (report != null) {
@@ -113,7 +122,7 @@ public class database {
                 System.out.println(entry.getKey() + " → " + entry.getValue() + " completed");
             }
         }
-
+*/
 
 
 
@@ -143,7 +152,7 @@ public class database {
 
 
 
-
+/*
         List<Document> docnotifications = getDoctorNotifications("D001");
 
         if (docnotifications.isEmpty()) {
@@ -157,6 +166,50 @@ public class database {
                 System.out.println("----------------------------------");
             }
         }
+
+*/
+
+
+
+/*
+        System.out.println("\n--- Today's Incomplete Appointments ---");
+
+        List<Document> today = getAllAppointmentNotificationsToday();
+
+        if (today.isEmpty()) {
+            System.out.println("No pending appointments today 🎉");
+        } else {
+            for (Document d : today) {
+                System.out.println("Appointment ID : " + d.getString("appointmentId"));
+                System.out.println("Patient        : " + d.getString("patientName"));
+                System.out.println("Doctor         : " + d.getString("doctorName"));
+                System.out.println("Specialty      : " + d.getString("specialty"));
+                System.out.println("Time Slot      : " + d.getString("timeSlot"));
+                System.out.println("Status         : " + d.getString("status"));
+                System.out.println("--------------------------------------");
+            }
+        }
+
+*/
+
+
+
+
+        List<Document> patients = getAllPatients();
+
+        if (patients.isEmpty()) {
+            System.out.println("No patients found.");
+        } else {
+            for (Document p : patients) {
+                System.out.println("Patient ID : " + p.getString("patientId"));
+                System.out.println("Name       : " + p.getString("name"));
+                System.out.println("Age        : " + p.getInteger("age"));
+                System.out.println("Gender     : " + p.getString("gender"));
+                System.out.println("Disease    : " + p.getString("disease"));
+                System.out.println("----------------------------------");
+            }
+        }
+
 
     }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -223,6 +276,28 @@ public class database {
             }
         }
     }
+
+
+    public static List<Document> getAllPatients() {
+
+        List<Document> patientsList = new ArrayList<>();
+
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> patients = db.getCollection(PATIENTS_COL);
+
+            patients.find().into(patientsList);
+        }
+
+        return patientsList;
+    }
+
+
+
+
+
+
 //    ------------------------------------------------------------------------------
 
     public static void addDoctor(String name, String specialty, boolean available, List<String> timeSlots) {
@@ -351,7 +426,7 @@ public class database {
 
 
 
-    public static void scheduleAppointment(String patientId, String doctorId, String timeSlot, String reason) {
+    public static void scheduleAppointment(String patientId, String doctorId,LocalDate appointmentDate, String timeSlot, String reason) {
 
         try (MongoClient client = MongoClients.create(URI)) {
 
@@ -401,9 +476,14 @@ public class database {
             String appointmentId = generateAppointmentId(appointments);
 
             // 6) Create appointment document
+            Date apptDate = Date.from(
+                    appointmentDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+            );
+
             Document appointment = new Document("appointmentId", appointmentId)
                     .append("patientId", patientId)
                     .append("doctorId", doctorId)
+                    .append("appointmentDate", apptDate)   // ✅ REAL appointment date
                     .append("timeSlot", timeSlot)
                     .append("reason", reason)
                     .append("status", "Scheduled")
@@ -519,7 +599,7 @@ public class database {
 
 
 
-    public static void assignDoctor(String patientId, String specialty, String timeSlot, String reason) {
+    public static void assignDoctor(String patientId, String specialty, LocalDate appointmentDate, String timeSlot, String reason) {
 
         try (MongoClient client = MongoClients.create(URI)) {
 
@@ -568,9 +648,14 @@ public class database {
             String appointmentId = generateAppointmentId(appointments);
 
             // 5) Create appointment
+            Date apptDate = Date.from(
+                    appointmentDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+            );
+
             Document appointment = new Document("appointmentId", appointmentId)
                     .append("patientId", patientId)
                     .append("doctorId", doctorId)
+                    .append("appointmentDate", apptDate)   // ✅ REAL appointment date
                     .append("timeSlot", timeSlot)
                     .append("reason", reason)
                     .append("status", "Scheduled")
@@ -765,7 +850,76 @@ public class database {
     }
 
 
+    public static List<Document> getAllAppointmentNotificationsToday() {
 
+        List<Document> notifications = new ArrayList<>();
+
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+
+            MongoCollection<Document> appointments = db.getCollection(APPOINTMENTS_COL);
+            MongoCollection<Document> patients = db.getCollection(PATIENTS_COL);
+            MongoCollection<Document> doctors = db.getCollection(DOCTORS_COL);
+
+            // 1) Calculate today's date range (00:00 → tomorrow 00:00)
+            LocalDate today = LocalDate.now(ZoneId.systemDefault());
+
+            Date startOfToday = Date.from(
+                    today.atStartOfDay(ZoneId.systemDefault()).toInstant()
+            );
+
+            Date startOfTomorrow = Date.from(
+                    today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant()
+            );
+
+            // 2) Find today's incomplete appointments
+            Document filter = new Document("appointmentDate",
+                    new Document("$gte", startOfToday).append("$lt", startOfTomorrow))
+                    .append("status", new Document("$ne", "Completed"));
+
+            List<Document> todaysAppointments =
+                    appointments.find(filter).into(new ArrayList<>());
+
+            // 3) Build notification data
+            for (Document appt : todaysAppointments) {
+
+                String patientId = appt.getString("patientId");
+                String doctorId = appt.getString("doctorId");
+
+                Document patient = patients.find(
+                        new Document("patientId", patientId)
+                ).first();
+
+                Document doctor = doctors.find(
+                        new Document("doctorId", doctorId)
+                ).first();
+
+                String patientName =
+                        (patient != null) ? patient.getString("name") : "Unknown Patient";
+
+                String doctorName =
+                        (doctor != null) ? doctor.getString("name") : "Unknown Doctor";
+
+                String specialty =
+                        (doctor != null) ? doctor.getString("specialty") : "N/A";
+
+                Document notification = new Document()
+                        .append("appointmentId", appt.getString("appointmentId"))
+                        .append("patientName", patientName)
+                        .append("doctorName", doctorName)
+                        .append("specialty", specialty)
+                        .append("timeSlot", appt.getString("timeSlot"))
+                        .append("reason", appt.getString("reason"))
+                        .append("status", appt.getString("status"))
+                        .append("appointmentDate", appt.getDate("appointmentDate"));
+
+                notifications.add(notification);
+            }
+        }
+
+        return notifications;
+    }
 
 
 
