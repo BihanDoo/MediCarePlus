@@ -1,5 +1,7 @@
 package view;
 
+
+import DataBase.database;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -13,7 +15,10 @@ import java.util.List;
 /*
 
 //here is the method i want to implement here.
-List<Document> notifications = getPatientNotifications("P001");
+remove hard coded values for notifications and make it to retrieve from the following methods
+
+DB = new database();
+List<Document> notifications = DB.getPatientNotifications("P001");
 
         if (notifications.isEmpty()) {
             System.out.println("No notifications available.");
