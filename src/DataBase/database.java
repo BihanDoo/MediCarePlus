@@ -194,7 +194,24 @@ public class database {
         }
     }
 
+    public static void deleteDoctor(String doctorId) {
 
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> doctors = db.getCollection(DOCTORS_COL);
+
+            Document filter = new Document("doctorId", doctorId);
+
+            DeleteResult result = doctors.deleteOne(filter);
+
+            if (result.getDeletedCount() == 0) {
+                System.out.println("No doctor found with ID: " + doctorId);
+            } else {
+                System.out.println("Doctor deleted successfully 🗑️");
+            }
+        }
+    }
 
 
 
