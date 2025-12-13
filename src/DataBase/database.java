@@ -55,7 +55,40 @@ public class database {
                         "Thursday 15:00-17:00",
                         "Monday 09:00-11:00"
                 )
-        );*/
+        );
+
+
+        List<Document> doctors = getAllDoctors();
+
+        if (doctors.isEmpty()) {
+            System.out.println("No doctors found.");
+        } else {
+            for (Document d : doctors) {
+                System.out.println("Doctor ID   : " + d.getString("doctorId"));
+                System.out.println("Name        : " + d.getString("name"));
+                System.out.println("Specialty   : " + d.getString("specialty"));
+                System.out.println("Available   : " + d.getBoolean("available"));
+                System.out.println("Time Slots  : " + d.get("timeSlots"));
+                System.out.println("----------------------------------");
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        */
 
 
 //deleteDoctor("D001");

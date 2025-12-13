@@ -10,9 +10,9 @@ import java.util.List;
 
 public class DoctorManagementForm extends JFrame {
 
-    private JTextField txtName, txtSpecialization, txtAvailable;
-    private JCheckBox chkActive;
-    private JTextArea txtSchedule;
+    private JTextField txtName, txtSpecialty, txtAvailable;
+    private JCheckBox chkAvailable;
+    private JTextArea txtTimeSlots;
     private JButton btnAdd, btnUpdate, btnDelete, btnClear, btnRefresh;
     private JTable doctorTable;
     private DefaultTableModel tableModel;
@@ -48,34 +48,36 @@ public class DoctorManagementForm extends JFrame {
         txtName = new JTextField();
         fieldsPanel.add(txtName);
 
-        fieldsPanel.add(new JLabel("Specialization:"));
-        txtSpecialization = new JTextField();
-        fieldsPanel.add(txtSpecialization);
+        fieldsPanel.add(new JLabel("Specialty:"));
+        txtSpecialty = new JTextField();
+        fieldsPanel.add(txtSpecialty);
 
-        fieldsPanel.add(new JLabel("Active:"));
-        chkActive = new JCheckBox();
-        fieldsPanel.add(chkActive);
+        fieldsPanel.add(new JLabel("Available:"));
+        chkAvailable = new JCheckBox();
+        fieldsPanel.add(chkAvailable);
 
-        fieldsPanel.add(new JLabel("Available Days/Hours:"));
+        fieldsPanel.add(new JLabel("Time Slots:"));
         txtAvailable = new JTextField();
-        txtAvailable.setToolTipText("e.g., Monday 09:00-17:00, Tuesday 10:00-16:00");
+        txtAvailable.setToolTipText("This field is for display only - use the text area below for editing");
+        txtAvailable.setEditable(false);
+        txtAvailable.setBackground(new Color(240, 240, 240));
         fieldsPanel.add(txtAvailable);
 
-        fieldsPanel.add(new JLabel("Schedule:"));
+        fieldsPanel.add(new JLabel("Edit Time Slots:"));
         panel.add(fieldsPanel, BorderLayout.NORTH);
 
-        // Schedule text area with scroll
-        txtSchedule = new JTextArea(6, 20);
-        txtSchedule.setLineWrap(true);
-        txtSchedule.setWrapStyleWord(true);
-        txtSchedule.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        JScrollPane scrollPane = new JScrollPane(txtSchedule);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Schedule (one per line)"));
+        // Time slots text area with scroll
+        txtTimeSlots = new JTextArea(6, 20);
+        txtTimeSlots.setLineWrap(true);
+        txtTimeSlots.setWrapStyleWord(true);
+        txtTimeSlots.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        JScrollPane scrollPane = new JScrollPane(txtTimeSlots);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Time Slots (one per line, e.g., Monday 09:00-11:00)"));
 
         panel.add(scrollPane, BorderLayout.CENTER);
 
         // Info label
-        JLabel infoLabel = new JLabel("Enter schedule items one per line (e.g., Monday 09:00-11:00)");
+        JLabel infoLabel = new JLabel("Enter time slots one per line (e.g., Monday 09:00-11:00)");
         infoLabel.setFont(new Font("Arial", Font.PLAIN, 10));
         infoLabel.setForeground(Color.GRAY);
         panel.add(infoLabel, BorderLayout.SOUTH);
@@ -87,7 +89,7 @@ public class DoctorManagementForm extends JFrame {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createTitledBorder("Doctors List"));
 
-        String[] columns = {"Doctor ID", "Name", "Specialization", "Active", "Schedule"};
+        String[] columns = {"Doctor ID", "Name", "Specialty", "Available", "Time Slots"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -96,7 +98,7 @@ public class DoctorManagementForm extends JFrame {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex == 3) return Boolean.class; // Active column
+                if (columnIndex == 3) return Boolean.class; // Available column
                 return String.class;
             }
         };
@@ -106,11 +108,11 @@ public class DoctorManagementForm extends JFrame {
         doctorTable.setRowHeight(25);
 
         // Set column widths
-        doctorTable.getColumnModel().getColumn(0).setPreferredWidth(80); // ID
-        doctorTable.getColumnModel().getColumn(1).setPreferredWidth(150); // Name
-        doctorTable.getColumnModel().getColumn(2).setPreferredWidth(120); // Specialization
-        doctorTable.getColumnModel().getColumn(3).setPreferredWidth(60);  // Active
-        doctorTable.getColumnModel().getColumn(4).setPreferredWidth(250); // Schedule
+        doctorTable.getColumnModel().getColumn(0).setPreferredWidth(80);  // ID
+        doctorTable.getColumnModel().getColumn(1).setPreferredWidth(200); // Name
+        doctorTable.getColumnModel().getColumn(2).setPreferredWidth(150); // Specialty
+        doctorTable.getColumnModel().getColumn(3).setPreferredWidth(80);  // Available
+        doctorTable.getColumnModel().getColumn(4).setPreferredWidth(300); // Time Slots
 
         // When row is selected, load data into form
         doctorTable.getSelectionModel().addListSelectionListener(e -> {
@@ -165,21 +167,29 @@ public class DoctorManagementForm extends JFrame {
     private void addDoctor(ActionEvent e) {
         try {
             String name = txtName.getText().trim();
-            String specialization = txtSpecialization.getText().trim();
-            boolean active = chkActive.isSelected();
-            String available = txtAvailable.getText().trim();
-            String scheduleText = txtSchedule.getText().trim();
+            String specialty = txtSpecialty.getText().trim();
+            boolean available = chkAvailable.isSelected();
+            String timeSlotsText = txtTimeSlots.getText().trim();
 
-            if (name.isEmpty() || specialization.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Name and Specialization are required!");
+            if (name.isEmpty() || specialty.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Name and Specialty are required!");
                 return;
             }
 
-            // Parse schedule lines
-            List<String> schedule = parseSchedule(scheduleText);
+            if (timeSlotsText.isEmpty()) {
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "No time slots provided. Continue?",
+                        "Confirm", JOptionPane.YES_NO_OPTION);
+                if (confirm != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
 
-            // Call database method
-            DB.addDoctor(name, specialization, active, schedule);
+            // Parse time slots lines
+            List<String> timeSlots = parseTimeSlots(timeSlotsText);
+
+            // Call database method - Note: database will generate the doctorId automatically
+            DB.addDoctor(name, specialty, available, timeSlots);
             JOptionPane.showMessageDialog(this, "Doctor added successfully!");
 
             refreshTable();
@@ -201,21 +211,29 @@ public class DoctorManagementForm extends JFrame {
         try {
             String doctorId = (String) tableModel.getValueAt(row, 0);
             String name = txtName.getText().trim();
-            String specialization = txtSpecialization.getText().trim();
-            boolean active = chkActive.isSelected();
-            String available = txtAvailable.getText().trim();
-            String scheduleText = txtSchedule.getText().trim();
+            String specialty = txtSpecialty.getText().trim();
+            boolean available = chkAvailable.isSelected();
+            String timeSlotsText = txtTimeSlots.getText().trim();
 
-            if (name.isEmpty() || specialization.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Name and Specialization are required!");
+            if (name.isEmpty() || specialty.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Name and Specialty are required!");
                 return;
             }
 
-            // Parse schedule lines
-            List<String> schedule = parseSchedule(scheduleText);
+            if (timeSlotsText.isEmpty()) {
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "No time slots provided. This will remove all time slots. Continue?",
+                        "Confirm", JOptionPane.YES_NO_OPTION);
+                if (confirm != JOptionPane.YES_OPTION) {
+                    return;
+                }
+            }
+
+            // Parse time slots lines
+            List<String> timeSlots = parseTimeSlots(timeSlotsText);
 
             // Call database method
-            DB.updateDoctor(doctorId, name, specialization, active, schedule);
+            DB.updateDoctor(doctorId, name, specialty, available, timeSlots);
             JOptionPane.showMessageDialog(this, "Doctor updated successfully!");
 
             refreshTable();
@@ -243,15 +261,15 @@ public class DoctorManagementForm extends JFrame {
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                // Call database method - Note: You need to implement deleteDoctor in your database class
-                // DB.deleteDoctor(doctorId);
-                JOptionPane.showMessageDialog(this, "Delete functionality needs to be implemented in database class!");
+                // Call database method
+                DB.deleteDoctor(doctorId);
+                JOptionPane.showMessageDialog(this, "Doctor deleted successfully!");
 
-                // For now, just refresh
                 refreshTable();
                 clearForm();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }
@@ -260,17 +278,44 @@ public class DoctorManagementForm extends JFrame {
         int row = doctorTable.getSelectedRow();
         if (row == -1) return;
 
-        txtName.setText((String) tableModel.getValueAt(row, 1));
-        txtSpecialization.setText((String) tableModel.getValueAt(row, 2));
-        chkActive.setSelected((Boolean) tableModel.getValueAt(row, 3));
+        try {
+            String doctorId = (String) tableModel.getValueAt(row, 0);
 
-        // Get schedule from table (it might be truncated in the table view)
-        String scheduleCell = (String) tableModel.getValueAt(row, 4);
-        txtSchedule.setText(scheduleCell);
+            // Fetch complete doctor document from database
+            List<Document> allDoctors = DB.getAllDoctors();
+            Document selectedDoctor = null;
 
-        // Note: Available field might not be in the table, you might need to fetch the full document
-        // For now, clear it or you could store it in a hidden field
-        txtAvailable.setText("");
+            for (Document doc : allDoctors) {
+                if (doc.getString("doctorId").equals(doctorId)) {
+                    selectedDoctor = doc;
+                    break;
+                }
+            }
+
+            if (selectedDoctor != null) {
+                txtName.setText(selectedDoctor.getString("name"));
+                txtSpecialty.setText(selectedDoctor.getString("specialty"));
+                chkAvailable.setSelected(selectedDoctor.getBoolean("available"));
+
+                // Get time slots
+                List<String> timeSlots = selectedDoctor.getList("timeSlots", String.class);
+                StringBuilder timeSlotsText = new StringBuilder();
+                for (String slot : timeSlots) {
+                    timeSlotsText.append(slot).append("\n");
+                }
+                txtTimeSlots.setText(timeSlotsText.toString().trim());
+
+                // Display first few time slots in the read-only field
+                if (!timeSlots.isEmpty()) {
+                    txtAvailable.setText(formatTimeSlotsForDisplay(timeSlots));
+                } else {
+                    txtAvailable.setText("No time slots");
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error loading doctor details: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void refreshTable() {
@@ -283,16 +328,16 @@ public class DoctorManagementForm extends JFrame {
 
             // Add to table
             for (Document doctor : doctors) {
-                // Format schedule for display (show first 2 items or truncated)
-                List<String> scheduleList = doctor.getList("schedule", String.class);
-                String scheduleDisplay = formatScheduleForDisplay(scheduleList);
+                // Get time slots for display
+                List<String> timeSlots = doctor.getList("timeSlots", String.class);
+                String timeSlotsDisplay = formatTimeSlotsForDisplay(timeSlots);
 
                 Object[] row = {
                         doctor.getString("doctorId"),
                         doctor.getString("name"),
-                        doctor.getString("specialization"),
-                        doctor.getBoolean("active"),
-                        scheduleDisplay
+                        doctor.getString("specialty"),
+                        doctor.getBoolean("available"),
+                        timeSlotsDisplay
                 };
                 tableModel.addRow(row);
             }
@@ -308,35 +353,35 @@ public class DoctorManagementForm extends JFrame {
         }
     }
 
-    private List<String> parseSchedule(String scheduleText) {
+    private List<String> parseTimeSlots(String timeSlotsText) {
         // Split by newline and filter out empty lines
-        return List.of(scheduleText.split("\\r?\\n"))
+        return List.of(timeSlotsText.split("\\r?\\n"))
                 .stream()
                 .map(String::trim)
                 .filter(line -> !line.isEmpty())
                 .toList();
     }
 
-    private String formatScheduleForDisplay(List<String> schedule) {
-        if (schedule == null || schedule.isEmpty()) {
-            return "No schedule";
+    private String formatTimeSlotsForDisplay(List<String> timeSlots) {
+        if (timeSlots == null || timeSlots.isEmpty()) {
+            return "No time slots";
         }
 
-        if (schedule.size() <= 2) {
-            return String.join("; ", schedule);
+        if (timeSlots.size() <= 3) {
+            return String.join("; ", timeSlots);
         }
 
-        // Show first 2 items and count of remaining
-        return schedule.get(0) + "; " + schedule.get(1) +
-                " (+" + (schedule.size() - 2) + " more)";
+        // Show first 3 items and count of remaining
+        return timeSlots.get(0) + "; " + timeSlots.get(1) + "; " + timeSlots.get(2) +
+                " (+" + (timeSlots.size() - 3) + " more)";
     }
 
     private void clearForm() {
         txtName.setText("");
-        txtSpecialization.setText("");
+        txtSpecialty.setText("");
         txtAvailable.setText("");
-        txtSchedule.setText("");
-        chkActive.setSelected(true);
+        txtTimeSlots.setText("");
+        chkAvailable.setSelected(true);
         doctorTable.clearSelection();
     }
 
