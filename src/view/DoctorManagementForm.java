@@ -8,6 +8,64 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
+
+
+/*
+
+DB = new database();
+//to add a doctor
+DB.addDoctor( "Dr. Saman Jayawardena", "General Physician", true,
+                List.of(
+                        "Monday 09:00-11:00",
+                        "Wednesday 14:00-16:00",
+                        "Friday 10:00-12:00"
+                )
+        );
+//to update doctor details
+DB.updateDoctor("D001", "Dr. Saman Jayawardena", "Internal Medicine", true,
+                List.of(
+                        "Tuesday 10:00-12:00",
+                        "Thursday 15:00-17:00",
+                        "Monday 09:00-11:00"
+                )
+        );
+//to delete a doctor
+DB.deleteDoctor("D001");
+
+
+//this is a sample to get all the doctors as a list
+//which is the returned as something like this
+doctorId:"D001"
+name:"Dr. Saman Jayawardena"
+specialty:"General Physician"
+available:true
+timeSlots:Array (2)
+0:"Monday 09:00-11:00"
+1:"Wednesday 14:00-16:00"
+
+List<Document> doctors = DB.getAllDoctors();
+
+        if (doctors.isEmpty()) {
+            System.out.println("No doctors found.");
+        } else {
+            for (Document d : doctors) {
+                System.out.println("Doctor ID   : " + d.getString("doctorId"));
+                System.out.println("Name        : " + d.getString("name"));
+                System.out.println("Specialty   : " + d.getString("specialty"));
+                System.out.println("Available   : " + d.getBoolean("available"));
+                System.out.println("Time Slots  : " + d.get("timeSlots"));
+                System.out.println("----------------------------------");
+            }
+        }
+
+//i need to implement these methods to this form below. can you do it for me?
+
+
+
+*/
+
+
+
 public class DoctorManagementForm extends JFrame {
 
     private JTextField txtName, txtSpecialization, txtAvailable;

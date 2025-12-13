@@ -16,6 +16,6 @@ public class AssignDoctors extends JFrame {
     }
 
     static void main() {
-
+        new AssignDoctors();
     }
 }
