@@ -635,7 +635,7 @@ public class database {
 
 
     public static void assignDoctor(String patientId, String specialty, LocalDate appointmentDate, String timeSlot, String reason) {
-
+        System.out.println(patientId+specialty+appointmentDate+timeSlot+reason);
         try (MongoClient client = MongoClients.create(URI)) {
 
             MongoDatabase db = client.getDatabase(DB_NAME);
@@ -705,6 +705,57 @@ public class database {
     }
 
 
+
+
+    public static List<Document> getDoctorsBySpecialty(String specialty) {
+
+        List<Document> doctorsList = new ArrayList<>();
+
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> doctors = db.getCollection(DOCTORS_COL);
+
+            Document filter = new Document("specialty", specialty);
+
+            doctors.find(filter).into(doctorsList);
+        }
+
+        return doctorsList;
+    }
+
+
+
+
+    public static List<String> getAvailableTimeSlots(String doctorId) {
+
+        List<String> timeSlots = new ArrayList<>();
+
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> doctors = db.getCollection(DOCTORS_COL);
+
+            Document doctor = doctors.find(
+                    new Document("doctorId", doctorId)
+            ).first();
+
+            if (doctor == null) {
+                System.out.println("No doctor found with ID: " + doctorId);
+                return timeSlots;
+            }
+
+            Object slotsObj = doctor.get("timeSlots");
+
+            if (slotsObj instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<String> slots = (List<String>) slotsObj;
+                timeSlots.addAll(slots);
+            }
+        }
+
+        return timeSlots;
+    }
 
 
 

@@ -151,6 +151,18 @@ public class testDBvalues {
         System.out.println("Best Doctor            : " + report.getString("bestDoctorName"));
 
 
+        List<String> slots = DB.getAvailableTimeSlots("D001");
+
+        if (slots.isEmpty()) {
+            System.out.println("No available time slots.");
+        } else {
+            System.out.println("Available Time Slots:");
+            for (String slot : slots) {
+                System.out.println("- " + slot);
+            }
+        }
+
+
 
     }
 }
