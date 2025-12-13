@@ -1,7 +1,7 @@
 package view;
 
-
 import DataBase.database;
+import org.bson.Document;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.table.*;
@@ -9,33 +9,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
-
-
-
-/*
-
-//here is the method i want to implement here.
-remove hard coded values for notifications and make it to retrieve from the following methods
-
-DB = new database();
-List<Document> notifications = DB.getPatientNotifications("P001");
-
-        if (notifications.isEmpty()) {
-            System.out.println("No notifications available.");
-        } else {
-            for (Document n : notifications) {
-                System.out.println("Appointment ID : " + n.getString("appointmentId"));
-                System.out.println("Doctor         : " + n.getString("doctorName"));
-                System.out.println("Specialty      : " + n.getString("specialty"));
-                System.out.println("Time Slot      : " + n.getString("timeSlot"));
-                System.out.println("Status         : " + n.getString("status"));
-                System.out.println("----------------------------------");
-            }
-        }
-
-//i want to implement this to the following code
-
-*/
 
 public class PatientNotificationSystem extends JFrame {
 
@@ -78,6 +51,7 @@ public class PatientNotificationSystem extends JFrame {
     private DefaultTableModel tableModel;
     private JTextArea consoleArea;
     private JLabel statusLabel;
+    private database DB; // Database instance
 
     // Colors for status
     private static final Color CONFIRMED_COLOR = new Color(46, 125, 50); // Green
@@ -85,7 +59,22 @@ public class PatientNotificationSystem extends JFrame {
     private static final Color CANCELLED_COLOR = new Color(198, 40, 40); // Red
 
     public PatientNotificationSystem() {
+        // Initialize UI first
         initializeUI();
+
+        // Then initialize database
+        try {
+            // Initialize database connection
+            DB = new database();
+            logToConsole("INFO: Database connection initialized successfully.");
+        } catch (Exception e) {
+            logToConsole("ERROR: Failed to initialize database connection: " + e.getMessage());
+            JOptionPane.showMessageDialog(this,
+                    "Failed to connect to database. Please check your connection.",
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
         loadInitialData();
     }
 
@@ -121,7 +110,7 @@ public class PatientNotificationSystem extends JFrame {
         headerPanel.setBackground(new Color(33, 97, 140));
 
         // Title label
-        JLabel titleLabel = new JLabel("🏥 Patient Notification System", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Patient Notification System", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
@@ -163,17 +152,17 @@ public class PatientNotificationSystem extends JFrame {
         patientIdField.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         patientIdField.setText("P001");
 
-        searchButton = new JButton("🔍 Search Notifications");
+        searchButton = new JButton(" Search Notifications");
         searchButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         searchButton.setBackground(new Color(33, 97, 140));
-        searchButton.setForeground(Color.WHITE);
+        searchButton.setForeground(Color.BLACK);
         searchButton.setFocusPainted(false);
         searchButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        clearButton = new JButton("🗑️ Clear");
+        clearButton = new JButton(" Clear");
         clearButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         clearButton.setBackground(new Color(100, 100, 120));
-        clearButton.setForeground(Color.WHITE);
+        clearButton.setForeground(Color.BLACK);
         clearButton.setFocusPainted(false);
         clearButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -345,8 +334,18 @@ public class PatientNotificationSystem extends JFrame {
         // Clear previous results
         clearTable();
 
-        // Get notifications for the patient
-        List<Notification> notifications = getPatientNotifications(patientId);
+        // Check if database is connected
+        if (DB == null) {
+            logToConsole("ERROR: Database connection is not available.");
+            JOptionPane.showMessageDialog(this,
+                    "Database connection is not available. Please restart the application.",
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Get notifications for the patient from database
+        List<Notification> notifications = getPatientNotificationsFromDB(patientId);
 
         if (notifications.isEmpty()) {
             statusLabel.setText("No notifications found for Patient ID: " + patientId);
@@ -372,6 +371,53 @@ public class PatientNotificationSystem extends JFrame {
         }
     }
 
+    /**
+     * Retrieves notifications for a specific patient from the database
+     */
+    private List<Notification> getPatientNotificationsFromDB(String patientId) {
+        List<Notification> notifications = new ArrayList<>();
+
+        try {
+            // Call the database method to get notifications
+            List<Document> notificationDocuments = DB.getPatientNotifications(patientId);
+
+            if (notificationDocuments.isEmpty()) {
+                logToConsole("INFO: Database returned empty result for Patient ID: " + patientId);
+            } else {
+                // Convert Document objects to Notification objects
+                for (Document doc : notificationDocuments) {
+                    String appointmentId = doc.getString("appointmentId");
+                    String doctorName = doc.getString("doctorName");
+                    String specialty = doc.getString("specialty");
+                    String timeSlot = doc.getString("timeSlot");
+                    String status = doc.getString("status");
+
+                    // Create Notification object and add to list
+                    Notification notification = new Notification(
+                            appointmentId,
+                            doctorName,
+                            specialty,
+                            timeSlot,
+                            status
+                    );
+                    notifications.add(notification);
+
+                    // Log the notification to console (optional)
+                    logToConsole("DEBUG: Retrieved - Appointment ID: " + appointmentId +
+                            ", Doctor: " + doctorName + ", Status: " + status);
+                }
+            }
+        } catch (Exception e) {
+            logToConsole("ERROR: Failed to retrieve notifications from database: " + e.getMessage());
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Error retrieving data from database: " + e.getMessage(),
+                    "Database Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        return notifications;
+    }
 
     private void clearTable() {
         tableModel.setRowCount(0);
@@ -380,114 +426,38 @@ public class PatientNotificationSystem extends JFrame {
     }
 
     private void logToConsole(String message) {
-        String timestamp = String.format("[%tT]", new java.util.Date());
-        consoleArea.append(timestamp + " " + message + "\n");
-        consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
-    }
-
-    /**
-     * Retrieves notifications for a specific patient
-     */
-    public static List<Notification> getPatientNotifications(String patientId) {
-        List<Notification> notifications = new ArrayList<>();
-
-        // Validate input
-        if (patientId == null || patientId.trim().isEmpty()) {
-            return notifications;
+        if (consoleArea != null) {
+            String timestamp = String.format("[%tT]", new java.util.Date());
+            consoleArea.append(timestamp + " " + message + "\n");
+            consoleArea.setCaretPosition(consoleArea.getDocument().getLength());
+        } else {
+            // Fallback to System.out if consoleArea is not initialized yet
+            System.out.println(message);
         }
-
-        // Simulate database query - return different data based on patient ID
-        switch (patientId.toUpperCase()) {
-            case "P001":
-                notifications.add(new Notification(
-                        "APT1001",
-                        "Dr. Sarah Johnson",
-                        "Cardiology",
-                        "2024-01-15 10:30 AM",
-                        "Confirmed"
-                ));
-                notifications.add(new Notification(
-                        "APT1002",
-                        "Dr. Michael Chen",
-                        "Neurology",
-                        "2024-01-16 02:00 PM",
-                        "Pending"
-                ));
-                notifications.add(new Notification(
-                        "APT1003",
-                        "Dr. Emily Williams",
-                        "Dermatology",
-                        "2024-01-18 11:15 AM",
-                        "Confirmed"
-                ));
-                notifications.add(new Notification(
-                        "APT1004",
-                        "Dr. Robert Kim",
-                        "Orthopedics",
-                        "2024-01-20 03:45 PM",
-                        "Cancelled"
-                ));
-                break;
-
-            case "P002":
-                notifications.add(new Notification(
-                        "APT2001",
-                        "Dr. Jennifer Lee",
-                        "Pediatrics",
-                        "2024-01-17 09:00 AM",
-                        "Confirmed"
-                ));
-                notifications.add(new Notification(
-                        "APT2002",
-                        "Dr. David Miller",
-                        "General Surgery",
-                        "2024-01-19 01:30 PM",
-                        "Pending"
-                ));
-                break;
-
-            case "P003":
-                notifications.add(new Notification(
-                        "APT3001",
-                        "Dr. Amanda Wilson",
-                        "Ophthalmology",
-                        "2024-01-21 10:00 AM",
-                        "Confirmed"
-                ));
-                break;
-
-            case "P004":
-                // Patient with no notifications
-                break;
-
-            default:
-                // For any other patient ID, return generic data
-                if (patientId.startsWith("P") || patientId.startsWith("p")) {
-                    notifications.add(new Notification(
-                            "APT" + (1000 + (int)(Math.random() * 1000)),
-                            "Dr. General Practitioner",
-                            "General Medicine",
-                            "2024-01-" + (15 + (int)(Math.random() * 10)) + " " +
-                                    (9 + (int)(Math.random() * 8)) + ":" +
-                                    (new String[]{"00", "15", "30", "45"})[(int)(Math.random() * 4)] +
-                                    " " + (new String[]{"AM", "PM"})[(int)(Math.random() * 2)],
-                            (new String[]{"Confirmed", "Pending", "Cancelled"})[(int)(Math.random() * 3)]
-                    ));
-                }
-                break;
-        }
-
-        return notifications;
     }
 
     private void loadInitialData() {
-        // Load initial data for P001
-        List<Notification> initialNotifications = getPatientNotifications("P001");
-        for (Notification n : initialNotifications) {
-            tableModel.addRow(n.toTableRow());
+        // Load initial data for default patient ID (P001)
+        String defaultPatientId = "P001";
+
+        // Only load data if database is connected
+        if (DB != null) {
+            List<Notification> initialNotifications = getPatientNotificationsFromDB(defaultPatientId);
+
+            if (!initialNotifications.isEmpty()) {
+                for (Notification n : initialNotifications) {
+                    tableModel.addRow(n.toTableRow());
+                }
+                statusLabel.setText("Loaded " + initialNotifications.size() + " notification(s) for Patient ID: " + defaultPatientId);
+                logToConsole("INFO: Initial data loaded for Patient ID: " + defaultPatientId);
+            } else {
+                statusLabel.setText("No notifications found for Patient ID: " + defaultPatientId);
+                logToConsole("INFO: No initial data found for Patient ID: " + defaultPatientId);
+            }
+        } else {
+            statusLabel.setText("Database not connected. Please check connection.");
+            logToConsole("WARNING: Database not connected. Cannot load initial data.");
         }
-        statusLabel.setText("Loaded " + initialNotifications.size() + " notification(s) for Patient ID: P001");
-        logToConsole("INFO: Initial data loaded for Patient ID: P001");
     }
 
     public static void main(String[] args) {
