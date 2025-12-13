@@ -56,6 +56,8 @@ public class database {
                         "Monday 09:00-11:00"
                 )
         );*/
+
+
 //deleteDoctor("D001");
 /*
 

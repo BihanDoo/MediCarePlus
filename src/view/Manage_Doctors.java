@@ -58,9 +58,10 @@ public class Manage_Doctors extends JFrame {
 
 
     static void main() {
-        database DB = new database();
-        new Manage_Doctors();
-
+        SwingUtilities.invokeLater(() -> {
+            PatientManagementForm form = new PatientManagementForm();
+            form.setVisible(true);
+        });
 
     }
 }
