@@ -29,7 +29,7 @@ public class database {
 
     public static void main(String[] args) {
 
-        //addPatient( "Nimal Perera", 32, "Male", "Fever");
+        addPatient( "Nimal Perera", 32, "Male", "Fever");
         /*
         updatePatient("P001", "Nimal Perera", 33, "Male", "Recovered");
         deletePatient("P001");
@@ -60,6 +60,7 @@ public class database {
         );
 
 */
+        //deleteDoctor("D001");
 
         Document info = trackAppointmentStatus("A001");
         if (info != null) {
