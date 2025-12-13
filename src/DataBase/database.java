@@ -8,7 +8,9 @@ import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 import java.util.List;
 import java.util.Date;
-
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 
 
@@ -34,19 +36,19 @@ public class database {
 
     public static void main(String[] args) {
 
-        addPatient( "Nimal Perera", 32, "Male", "Fever");
+        //addPatient( "Nimal Perera", 32, "Male", "Fever");
         /*
         updatePatient("P001", "Nimal Perera", 33, "Male", "Recovered");
         deletePatient("P001");
-
+*//*
         addDoctor( "Dr. Saman Jayawardena", "General Physician", true,
                 List.of(
                         "Monday 09:00-11:00",
                         "Wednesday 14:00-16:00",
                         "Friday 10:00-12:00"
                 )
-        );
-*//*
+        );*/
+/*
         updateDoctor("D001", "Dr. Saman Jayawardena", "Internal Medicine", true,
                 List.of(
                         "Tuesday 10:00-12:00",
@@ -67,6 +69,8 @@ public class database {
 */
 
 
+
+
         Document info = trackAppointmentStatus("A001");
         if (info != null) {
             System.out.println("Appointment ID : " + info.getString("appointmentId"));
@@ -77,11 +81,13 @@ public class database {
             System.out.println("Status         : " + info.getString("status"));
             System.out.println("Created At     : " + info.getDate("createdAt"));
         }
-
+/*
         updateAppointment("A001", "Completed");
         updateAppointment("A002", "Cancelled");
+*/
 
 
+        assignDoctor("P001", "General Physician", "Monday 09:00-11:00", "Fever and headache");
     }
 
     public static void addPatient(String name, int age, String gender, String disease) {
@@ -435,6 +441,161 @@ public class database {
             } else {
                 System.out.println("Appointment status updated to '" + newStatus + "' ✅");
             }
+        }
+    }
+
+
+
+
+
+
+    public static void assignDoctor(String patientId, String specialty, String timeSlot, String reason) {
+
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+
+            MongoCollection<Document> patients = db.getCollection(PATIENTS_COL);
+            MongoCollection<Document> doctors = db.getCollection(DOCTORS_COL);
+            MongoCollection<Document> appointments = db.getCollection(APPOINTMENTS_COL);
+
+            // 1) Check patient exists
+            Document patient = patients.find(new Document("patientId", patientId)).first();
+            if (patient == null) {
+                System.out.println("Cannot assign doctor: Patient not found (" + patientId + ")");
+                return;
+            }
+
+            // 2) Find available doctor with given specialty
+            Document doctor = doctors.find(
+                    new Document("specialty", specialty)
+                            .append("available", true)
+            ).first();
+
+            if (doctor == null) {
+                System.out.println("No available doctor found for specialty: " + specialty);
+                return;
+            }
+
+            // 3) Check requested time slot is available for this doctor
+            Object slotsObj = doctor.get("timeSlots");
+            if (!(slotsObj instanceof List)) {
+                System.out.println("Doctor has no available time slots.");
+                return;
+            }
+
+            @SuppressWarnings("unchecked")
+            List<String> slots = (List<String>) slotsObj;
+
+            if (!slots.contains(timeSlot)) {
+                System.out.println("Doctor is not available at time slot: " + timeSlot);
+                return;
+            }
+
+            String doctorId = doctor.getString("doctorId");
+
+            // 4) Generate appointment ID
+            String appointmentId = generateAppointmentId(appointments);
+
+            // 5) Create appointment
+            Document appointment = new Document("appointmentId", appointmentId)
+                    .append("patientId", patientId)
+                    .append("doctorId", doctorId)
+                    .append("timeSlot", timeSlot)
+                    .append("reason", reason)
+                    .append("status", "Scheduled")
+                    .append("createdAt", new Date());
+
+            appointments.insertOne(appointment);
+
+            System.out.println(
+                    "Doctor assigned successfully ✅\n" + "Appointment ID: " + appointmentId + "\n" + "Doctor ID     : " + doctorId + "\n" + "Specialty     : " + specialty
+            );
+        }
+    }
+
+
+
+
+
+
+    public static Document generateReportThisMonth() {
+
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+
+            MongoCollection<Document> appointments = db.getCollection(APPOINTMENTS_COL);
+            MongoCollection<Document> doctors = db.getCollection(DOCTORS_COL);
+
+            // 1) Calculate start and end of current month
+            LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
+            LocalDate endOfMonth = startOfMonth.plusMonths(1);
+
+            Date startDate = Date.from(startOfMonth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Date endDate = Date.from(endOfMonth.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+            // 2) Query appointments for this month
+            List<Document> monthlyAppointments = appointments.find(
+                    new Document("createdAt",
+                            new Document("$gte", startDate)
+                                    .append("$lt", endDate))
+            ).into(new ArrayList<>());
+
+            int totalAppointments = monthlyAppointments.size();
+            int completedAppointments = 0;
+
+            // doctorId -> completed count
+            Map<String, Integer> doctorCompletedCount = new HashMap<>();
+
+            for (Document appt : monthlyAppointments) {
+                String status = appt.getString("status");
+                String doctorId = appt.getString("doctorId");
+
+                if ("Completed".equalsIgnoreCase(status)) {
+                    completedAppointments++;
+
+                    doctorCompletedCount.put(
+                            doctorId,
+                            doctorCompletedCount.getOrDefault(doctorId, 0) + 1
+                    );
+                }
+            }
+
+            // 3) Find best performed doctor
+            String bestDoctorId = null;
+            int maxCompleted = 0;
+
+            for (Map.Entry<String, Integer> entry : doctorCompletedCount.entrySet()) {
+                if (entry.getValue() > maxCompleted) {
+                    maxCompleted = entry.getValue();
+                    bestDoctorId = entry.getKey();
+                }
+            }
+
+            String bestDoctorName = "N/A";
+
+            if (bestDoctorId != null) {
+                Document bestDoctor = doctors.find(
+                        new Document("doctorId", bestDoctorId)
+                ).first();
+
+                if (bestDoctor != null) {
+                    bestDoctorName = bestDoctor.getString("name");
+                }
+            }
+
+            // 4) Build summary result
+            Document report = new Document()
+                    .append("month", startOfMonth.getMonth().toString())
+                    .append("year", startOfMonth.getYear())
+                    .append("totalAppointments", totalAppointments)
+                    .append("completedAppointments", completedAppointments)
+                    .append("bestDoctorId", bestDoctorId)
+                    .append("bestDoctorName", bestDoctorName)
+                    .append("doctorPerformance", doctorCompletedCount);
+
+            return report;
         }
     }
 
