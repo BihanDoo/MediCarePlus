@@ -10,6 +10,10 @@ import DataBase.database;
 
 
 public class Manage_Doctors extends JFrame {
+    private JLabel lblname;
+    private JTextField txtname,txtavailable,txtspecialty;
+    private JLabel lblspecialty ,lblavailable,lbltimeslots;
+    private JComboBox timesslotscombobox;
     private JPanel ManageDoctorsPane;
     private database DB;
 
