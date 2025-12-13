@@ -27,6 +27,11 @@ public class database {
     private static final String APPOINTMENTS_COL = "appointments";
     private static final String NOTIFICATIONS_COL = "notifications";
 
+
+    public database(){
+
+    }
+
     public static void main(String[] args) {
 
         addPatient( "Nimal Perera", 32, "Male", "Fever");
@@ -49,7 +54,7 @@ public class database {
                         "Monday 09:00-11:00"
                 )
         );*/
-
+//deleteDoctor("D001");
 
 /*
         scheduleAppointment(
@@ -60,7 +65,7 @@ public class database {
         );
 
 */
-        //deleteDoctor("D001");
+
 
         Document info = trackAppointmentStatus("A001");
         if (info != null) {
@@ -72,6 +77,9 @@ public class database {
             System.out.println("Status         : " + info.getString("status"));
             System.out.println("Created At     : " + info.getDate("createdAt"));
         }
+
+        updateAppointment("A001", "Completed");
+        updateAppointment("A002", "Cancelled");
 
 
     }
@@ -406,7 +414,29 @@ public class database {
         }
     }
 
+    public static void updateAppointment(String appointmentId, String newStatus) {
 
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> appointments = db.getCollection(APPOINTMENTS_COL);
+
+            Document filter = new Document("appointmentId", appointmentId);
+
+            Document update = new Document("$set",
+                    new Document("status", newStatus)
+                            .append("updatedAt", new java.util.Date())
+            );
+
+            UpdateResult result = appointments.updateOne(filter, update);
+
+            if (result.getMatchedCount() == 0) {
+                System.out.println("No appointment found with ID: " + appointmentId);
+            } else {
+                System.out.println("Appointment status updated to '" + newStatus + "' ✅");
+            }
+        }
+    }
 
 
 }
