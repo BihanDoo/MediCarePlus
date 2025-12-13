@@ -27,6 +27,6 @@ public class Manage_Doctors extends JFrame {
     static void main() {
         new Manage_Doctors();
         database DBDB = new database();
-        DBDB.addPatient( "Kamal Perera", 32, "Male", "Fever");
+        DBDB.addPatient( "Sunil Perera", 35, "Male", "Fever");
     }
 }

@@ -119,4 +119,5 @@ public class PatientDatabase {
         System.out.println("Total patients: " + patientList.size());
 
     }
+
 }
