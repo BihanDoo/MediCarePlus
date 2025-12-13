@@ -11,7 +11,7 @@ import java.util.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-
+import java.util.ArrayList;
 
 
 
@@ -70,7 +70,7 @@ public class database {
 
 
 
-
+/*
         Document info = trackAppointmentStatus("A001");
         if (info != null) {
             System.out.println("Appointment ID : " + info.getString("appointmentId"));
@@ -81,13 +81,41 @@ public class database {
             System.out.println("Status         : " + info.getString("status"));
             System.out.println("Created At     : " + info.getDate("createdAt"));
         }
+
+        */
 /*
         updateAppointment("A001", "Completed");
         updateAppointment("A002", "Cancelled");
 */
 
 
-        assignDoctor("P001", "General Physician", "Monday 09:00-11:00", "Fever and headache");
+        //assignDoctor("P001", "General Physician", "Monday 09:00-11:00", "Fever and headache");
+
+
+
+
+
+
+        Document report = generateReportThisMonth();
+
+        if (report != null) {
+            System.out.println("Month: " + report.getString("month") + " " + report.getInteger("year"));
+            System.out.println("Total Appointments     : " + report.getInteger("totalAppointments"));
+            System.out.println("Completed Appointments : " + report.getInteger("completedAppointments"));
+            System.out.println("Best Doctor            : " + report.getString("bestDoctorName"));
+
+            System.out.println("\nDoctor Performance:");
+            @SuppressWarnings("unchecked")
+            Map<String, Integer> perf =
+                    (Map<String, Integer>) report.get("doctorPerformance");
+
+            for (Map.Entry<String, Integer> entry : perf.entrySet()) {
+                System.out.println(entry.getKey() + " → " + entry.getValue() + " completed");
+            }
+        }
+
+
+
     }
 
     public static void addPatient(String name, int age, String gender, String disease) {
