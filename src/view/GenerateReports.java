@@ -33,7 +33,6 @@ public class GenerateReports extends JFrame {
                     sb.append("Completed Appointments: ").append(report.getInteger("completedAppointments")).append("\n");
                     sb.append("Best Doctor           : ").append(report.getString("bestDoctorName")).append("\n\n");
 
-
                     sb.append("Doctor Performance:\n");
                     Map<String, Integer> perf = (Map<String, Integer>) report.get("doctorPerformance");
                     for (Map.Entry<String, Integer> entry : perf.entrySet()) {
