@@ -343,6 +343,7 @@ public class PatientNotificationSystem extends JFrame {
         }
     }
 
+
     private void clearTable() {
         tableModel.setRowCount(0);
         statusLabel.setText("Table cleared");
