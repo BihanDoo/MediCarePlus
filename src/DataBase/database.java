@@ -116,8 +116,50 @@ public class database {
 
 
 
-    }
 
+
+
+
+
+
+/*
+        List<Document> notifications = getPatientNotifications("P001");
+
+        if (notifications.isEmpty()) {
+            System.out.println("No notifications available.");
+        } else {
+            for (Document n : notifications) {
+                System.out.println("Appointment ID : " + n.getString("appointmentId"));
+                System.out.println("Doctor         : " + n.getString("doctorName"));
+                System.out.println("Specialty      : " + n.getString("specialty"));
+                System.out.println("Time Slot      : " + n.getString("timeSlot"));
+                System.out.println("Status         : " + n.getString("status"));
+                System.out.println("----------------------------------");
+            }
+        }
+*/
+
+
+
+
+
+
+        List<Document> docnotifications = getDoctorNotifications("D001");
+
+        if (docnotifications.isEmpty()) {
+            System.out.println("No appointments assigned.");
+        } else {
+            for (Document n : docnotifications) {
+                System.out.println("Appointment ID : " + n.getString("appointmentId"));
+                System.out.println("Patient Name   : " + n.getString("patientName"));
+                System.out.println("Time Slot      : " + n.getString("timeSlot"));
+                System.out.println("Status         : " + n.getString("status"));
+                System.out.println("----------------------------------");
+            }
+        }
+
+    }
+//--------------------------------------------------------------------------------------------------------------------------------------------------------
     public static void addPatient(String name, int age, String gender, String disease) {
 
         try (MongoClient client = MongoClients.create(URI)) {
@@ -626,6 +668,107 @@ public class database {
             return report;
         }
     }
+
+
+
+
+
+    public static List<Document> getPatientNotifications(String patientId) {
+
+        List<Document> notifications = new ArrayList<>();
+
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+
+            MongoCollection<Document> appointments = db.getCollection(APPOINTMENTS_COL);
+            MongoCollection<Document> doctors = db.getCollection(DOCTORS_COL);
+
+            // 1) Get all appointments for this patient
+            List<Document> patientAppointments = appointments.find(
+                    new Document("patientId", patientId)
+            ).into(new ArrayList<>());
+
+            // 2) Build notification data for each appointment
+            for (Document appt : patientAppointments) {
+
+                String doctorId = appt.getString("doctorId");
+
+                Document doctor = doctors.find(
+                        new Document("doctorId", doctorId)
+                ).first();
+
+                String doctorName = (doctor != null) ? doctor.getString("name") : "Unknown Doctor";
+                String specialty = (doctor != null) ? doctor.getString("specialty") : "N/A";
+
+                Document notification = new Document()
+                        .append("appointmentId", appt.getString("appointmentId"))
+                        .append("doctorName", doctorName)
+                        .append("specialty", specialty)
+                        .append("timeSlot", appt.getString("timeSlot"))
+                        .append("reason", appt.getString("reason"))
+                        .append("status", appt.getString("status"))
+                        .append("createdAt", appt.getDate("createdAt"));
+
+                notifications.add(notification);
+            }
+        }
+
+        return notifications;
+    }
+
+
+
+
+
+
+    public static List<Document> getDoctorNotifications(String doctorId) {
+
+        List<Document> notifications = new ArrayList<>();
+
+        try (MongoClient client = MongoClients.create(URI)) {
+
+            MongoDatabase db = client.getDatabase(DB_NAME);
+
+            MongoCollection<Document> appointments = db.getCollection(APPOINTMENTS_COL);
+            MongoCollection<Document> patients = db.getCollection(PATIENTS_COL);
+
+            // 1) Get all appointments for this doctor
+            List<Document> doctorAppointments = appointments.find(
+                    new Document("doctorId", doctorId)
+            ).into(new ArrayList<>());
+
+            // 2) Build notification data for each appointment
+            for (Document appt : doctorAppointments) {
+
+                String patientId = appt.getString("patientId");
+
+                Document patient = patients.find(
+                        new Document("patientId", patientId)
+                ).first();
+
+                String patientName = (patient != null) ? patient.getString("name") : "Unknown Patient";
+
+                Document notification = new Document()
+                        .append("appointmentId", appt.getString("appointmentId"))
+                        .append("patientName", patientName)
+                        .append("timeSlot", appt.getString("timeSlot"))
+                        .append("reason", appt.getString("reason"))
+                        .append("status", appt.getString("status"))
+                        .append("createdAt", appt.getDate("createdAt"));
+
+                notifications.add(notification);
+            }
+        }
+
+        return notifications;
+    }
+
+
+
+
+
+
 
 
 }
