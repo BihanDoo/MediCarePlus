@@ -1,5 +1,11 @@
 package DataBase;
+
+
+//thisssssss
 import DataBase.database;
+
+
+
 import org.bson.Document;
 
 import java.time.LocalDate;
@@ -8,7 +14,14 @@ import java.util.List;
 public class testDBvalues {
     static void main() {
 
+
+        //---------
         database DB = new database();
+        //---------
+
+
+
+
         DB.addPatient("Nimal Perera", 32, "Male", "Fever");
         DB.addPatient("Kumari Silva", 45, "Female", "Diabetes");
         DB.addPatient("Suresh Kumar", 28, "Male", "Headache");
