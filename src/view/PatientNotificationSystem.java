@@ -8,6 +8,30 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+/*
+
+//here is the method i want to implement here.
+List<Document> notifications = getPatientNotifications("P001");
+
+        if (notifications.isEmpty()) {
+            System.out.println("No notifications available.");
+        } else {
+            for (Document n : notifications) {
+                System.out.println("Appointment ID : " + n.getString("appointmentId"));
+                System.out.println("Doctor         : " + n.getString("doctorName"));
+                System.out.println("Specialty      : " + n.getString("specialty"));
+                System.out.println("Time Slot      : " + n.getString("timeSlot"));
+                System.out.println("Status         : " + n.getString("status"));
+                System.out.println("----------------------------------");
+            }
+        }
+
+//i want to implement this to the following code
+
+*/
+
 public class PatientNotificationSystem extends JFrame {
 
     // Define a Notification class to hold our data
