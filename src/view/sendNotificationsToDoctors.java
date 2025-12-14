@@ -1,6 +1,12 @@
 package view;
 
 import javax.swing.*;
+import DataBase.database;
+import org.bson.Document;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 public class sendNotificationsToDoctors extends JFrame{
@@ -16,6 +22,7 @@ public class sendNotificationsToDoctors extends JFrame{
     private JScrollPane Scroll;
     private JButton SendBttn;
     private JButton ClearBttn;
+    private JLabel firsttxt;
 
 
     public sendNotificationsToDoctors() {
@@ -37,13 +44,24 @@ public class sendNotificationsToDoctors extends JFrame{
         SendBttn.addActionListener(e -> sendNotification());
         ClearBttn.addActionListener(e -> msgTxtArea.setText(""));
     }
-
-    // Temporary doctor list (replace with DB call later)
     private void loadDoctors() {
+
         DoctorComboBox.removeAllItems();
-        DoctorComboBox.addItem("Dr. Silva (ID:101)");
-        DoctorComboBox.addItem("Dr. Perera (ID:102)");
-        DoctorComboBox.addItem("Dr. Fernando (ID:103)");
+        database DB = new database();
+        List<Document> doctors = DB.getAllDoctors();
+
+        if (doctors.isEmpty()) {
+            DoctorComboBox.addItem("No doctors available");
+            return;
+        }
+
+        for (Document d : doctors) {
+
+            String name = d.getString("name");
+            String doctorId = d.getString("doctorId");
+
+            DoctorComboBox.addItem(name + " (ID: " + doctorId + ")");
+        }
     }
     // Hardcoded Notification Types
     private void loadNotificationTypes() {
@@ -98,5 +116,22 @@ public class sendNotificationsToDoctors extends JFrame{
     // Main method to run the form
     public static void main(String[] args) {
         SwingUtilities.invokeLater(sendNotificationsToDoctors::new);
+        database DB = new database();
+
+        List<Document> doctors = DB.getAllDoctors();
+
+        if (doctors.isEmpty()) {
+            System.out.println("No doctors found.");
+        } else {
+            for (Document d : doctors) {
+                System.out.println("Doctor ID   : " + d.getString("doctorId"));
+                System.out.println("Name        : " + d.getString("name"));
+                System.out.println("Specialty   : " + d.getString("specialty"));
+                System.out.println("Available   : " + d.getBoolean("available"));
+                System.out.println("Time Slots  : " + d.get("timeSlots"));
+                System.out.println("----------------------------------");
+            }
+        }
+
     }
 }
