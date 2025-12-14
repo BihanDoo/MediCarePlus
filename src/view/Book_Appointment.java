@@ -16,7 +16,32 @@ public class Book_Appointment extends JFrame {
     private JTextField reason;
     private JButton bookButton;
 
-    Book_Appointment(){
+    public Book_Appointment(){
+        if (bookappointmentPane == null) {
+
+            bookappointmentPane = new JPanel();
+            bookappointmentPane.setLayout(new BoxLayout(bookappointmentPane, BoxLayout.Y_AXIS));
+
+            patientid = new JTextField();
+            docid = new JTextField();
+            date = new JTextField();
+            time = new JTextField();
+            reason = new JTextField();
+            bookButton = new JButton("Book");
+
+            bookappointmentPane.add(new JLabel("Patient ID:"));
+            bookappointmentPane.add(patientid);
+            bookappointmentPane.add(new JLabel("Doctor ID:"));
+            bookappointmentPane.add(docid);
+            bookappointmentPane.add(new JLabel("Date (YYYY-MM-DD):"));
+            bookappointmentPane.add(date);
+            bookappointmentPane.add(new JLabel("Time:"));
+            bookappointmentPane.add(time);
+            bookappointmentPane.add(new JLabel("Reason:"));
+            bookappointmentPane.add(reason);
+            bookappointmentPane.add(bookButton);
+        }
+
         setContentPane(bookappointmentPane);
         setTitle("Book appointment");
         setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -52,7 +77,12 @@ public class Book_Appointment extends JFrame {
         });
     }
 
-    static void main() {
-
+    public static void main(String[] args) {
+        System.out.println("Starting Book_Appointment...");
+        try {
+            new Book_Appointment();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
