@@ -623,11 +623,13 @@ public class database {
 
             if (result.getMatchedCount() == 0) {
                 System.out.println("No appointment found with ID: " + appointmentId);
+                return false;
             } else {
                 System.out.println("Appointment status updated to '" + newStatus + "' ✅");
+                return true;
             }
         }
-        return false;
+
     }
 
 

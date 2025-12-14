@@ -232,4 +232,8 @@ public class AssignDoctors extends JFrame {
         SwingUtilities.invokeLater(AssignDoctors::new);
         //new AssignDoctors();
     }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 }

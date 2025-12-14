@@ -17,6 +17,7 @@ public class sendNotificationsToDoctors extends JFrame{
     private JButton SendBttn;
     private JButton ClearBttn;
     private JPanel title;
+    private JLabel firsttxt;
 
 
     public sendNotificationsToDoctors() {
