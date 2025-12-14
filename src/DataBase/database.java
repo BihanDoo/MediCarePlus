@@ -605,7 +605,7 @@ public class database {
         }
     }
 
-    public static void updateAppointment(String appointmentId, String newStatus) {
+    public static boolean updateAppointment(String appointmentId, String newStatus) {
 
         try (MongoClient client = MongoClients.create(URI)) {
 
@@ -627,6 +627,7 @@ public class database {
                 System.out.println("Appointment status updated to '" + newStatus + "' ✅");
             }
         }
+        return false;
     }
 
 
@@ -1024,6 +1025,23 @@ public class database {
         return doctorsList;
     }
 
+    public static MongoCollection<Document> getAppointmentCollection() {
+        MongoClient client = MongoClients.create(URI);
+        MongoDatabase database = client.getDatabase(DB_NAME);
+        return database.getCollection(APPOINTMENTS_COL);
+    }
 
+    public List<Document> getAllAppointments() {
+
+        MongoCollection<Document> collection = getAppointmentCollection();
+
+        List<Document> appointments = new ArrayList<>();
+
+        for (Document doc : collection.find()) {
+            appointments.add(doc);
+        }
+
+        return appointments;
+    }
 
 }

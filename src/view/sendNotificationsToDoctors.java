@@ -16,6 +16,7 @@ public class sendNotificationsToDoctors extends JFrame{
     private JScrollPane Scroll;
     private JButton SendBttn;
     private JButton ClearBttn;
+    private JPanel title;
 
 
     public sendNotificationsToDoctors() {
