@@ -117,9 +117,11 @@ public class sendNotificationsToDoctors extends JFrame{
     public static void main(String[] args) {
         SwingUtilities.invokeLater(sendNotificationsToDoctors::new);
         database DB = new database();
+        sendNotificationsToDoctors SND = new sendNotificationsToDoctors();
 
         List<Document> doctors = DB.getAllDoctors();
 
+        SND.loadDoctors();
         if (doctors.isEmpty()) {
             System.out.println("No doctors found.");
         } else {
