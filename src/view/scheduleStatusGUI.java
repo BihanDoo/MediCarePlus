@@ -11,38 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-/*
 
-can you pls update and refine the code? FYI, here is an example of the use of the method used here
-
-
-
-database DB = new database();
-DB.scheduleAppointment(
-                "P001",
-                "D001",
-                LocalDate.now(),          // today
-                "Monday 09:00-11:00",
-                "General checkup"
-        );
-
-
-and another method inside the DB, which looks like this
-public List<Document> getAllAppointments() {
-
-        MongoCollection<Document> collection = getAppointmentCollection();
-
-        List<Document> appointments = new ArrayList<>();
-
-        for (Document doc : collection.find()) {
-            appointments.add(doc);
-        }
-
-        return appointments;
-    }
-
-update the code to best use of the following into the code below. show me where to change
-* */
 
 
 
