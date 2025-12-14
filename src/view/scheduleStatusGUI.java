@@ -17,7 +17,7 @@ import java.util.List;
 
 
 
-public class scheduleStatusGUI {
+public class scheduleStatusGUI extends JFrame{
     private JTable table;
     private JComboBox comboBox1;
     private JButton button1;
@@ -25,6 +25,24 @@ public class scheduleStatusGUI {
     private database db;
 
     public scheduleStatusGUI() {
+
+//        JFrame frame = new JFrame("Appointment Status Manager"); // Better title
+//        frame.setContentPane(new scheduleStatusGUI().backpanel);
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.setSize(800, 600); // Larger size for better visibility
+//        frame.setLocationRelativeTo(null); // Center the window on screen
+//        frame.setVisible(true);
+
+        setContentPane(backpanel);
+        setTitle("Admin Panel");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(600,550);
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+
+
+
         setTableData();
 
 
@@ -80,13 +98,8 @@ public class scheduleStatusGUI {
 
 
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Appointment Status Manager"); // Better title
-        frame.setContentPane(new scheduleStatusGUI().backpanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600); // Larger size for better visibility
-        frame.setLocationRelativeTo(null); // Center the window on screen
-        frame.setVisible(true);
+    static void main(String[] args) {
+        new scheduleStatusGUI();
     }
 
     public void setTableData() {

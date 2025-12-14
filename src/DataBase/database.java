@@ -1046,4 +1046,22 @@ public class database {
         return appointments;
     }
 
+
+
+    public static String getPatientNameById(String patientId) {
+        try (MongoClient client = MongoClients.create(URI)) {
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> patients = db.getCollection(PATIENTS_COL);
+
+            Document patient = patients.find(new Document("patientId", patientId)).first();
+
+            if (patient != null) {
+                return patient.getString("name");
+            } else {
+                System.out.println("No patient found with ID: " + patientId);
+                return null;
+            }
+        }
+    }
+
 }

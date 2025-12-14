@@ -34,12 +34,7 @@ public class main extends JFrame {
 
 
 
-        scheduleAppointmentButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Book_Appointment().setVisible(true);
-            }
-        });
+
         trackAppointmentStatusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -56,12 +51,6 @@ public class main extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new GenerateReports().setVisible(true);
-            }
-        });
-        sendNotificPatBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new SendNotificationsToPatients().setVisible(true);
             }
         });
         sendNotificDocBtn.addActionListener(new ActionListener() {
@@ -87,6 +76,12 @@ public class main extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new PatientNotificationSystem().setVisible(true);
+            }
+        });
+        scheduleAppointmentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new scheduleStatusGUI().setVisible(true);
             }
         });
     }
