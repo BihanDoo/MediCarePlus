@@ -35,7 +35,7 @@ public class Book_Appointment extends JFrame {
             bookappointmentPane.add(docid);
             bookappointmentPane.add(new JLabel("Date (YYYY-MM-DD):"));
             bookappointmentPane.add(date);
-            bookappointmentPane.add(new JLabel("Time: "));
+            bookappointmentPane.add(new JLabel("Time:"));
             bookappointmentPane.add(time);
             bookappointmentPane.add(new JLabel("Reason:"));
             bookappointmentPane.add(reason);
