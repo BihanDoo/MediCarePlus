@@ -11,15 +11,13 @@ public class main extends JFrame {
     private JButton generateMonthlyReportsButton;
     private JButton sendNotificPatBtn;
     private JButton sendNotificDocBtn;
-    private JButton patientAddBtn;
     private JButton DocUpdtBtn;
     private JButton scheduleAppointmentButton;
     private JButton trackAppointmentStatusButton;
     private JPanel mainviewpane;
-    private JButton patientRemoveButton;
-    private JButton patientUpdtBtn;
-    private JButton DocAddBtn;
-    private JButton DocRemvBtn;
+
+    private JButton patientsManagementButton;
+    private JButton doctorsManagementButton;
 
     main() {
         setContentPane(mainviewpane);
@@ -33,30 +31,10 @@ public class main extends JFrame {
             PatientManagementForm patientForm = new PatientManagementForm();
             patientForm.setVisible(true);
         });
-        DocAddBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AssignDoctors().setVisible(true);
-            }
-        });
-        DocUpdtBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AssignDoctors().setVisible(true);
-            }
-        });
-        DocRemvBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new AssignDoctors().setVisible(true);
-            }
-        });
-        scheduleAppointmentButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Book_Appointment().setVisible(true);
-            }
-        });
+
+
+
+
         trackAppointmentStatusButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -75,16 +53,35 @@ public class main extends JFrame {
                 new GenerateReports().setVisible(true);
             }
         });
-        sendNotificPatBtn.addActionListener(new ActionListener() {
+        sendNotificDocBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new SendNotificationsToPatients().setVisible(true);
             }
         });
-        sendNotificDocBtn.addActionListener(new ActionListener() {
+        patientsManagementButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SendNotificationsToPatients().setVisible(true);
+                new PatientManagementForm().setVisible(true);
+
+            }
+        });
+        doctorsManagementButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new DoctorManagementForm().setVisible(true);
+            }
+        });
+        sendNotificPatBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new PatientNotificationSystem().setVisible(true);
+            }
+        });
+        scheduleAppointmentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new scheduleStatusGUI().setVisible(true);
             }
         });
     }

@@ -605,7 +605,7 @@ public class database {
         }
     }
 
-    public static void updateAppointment(String appointmentId, String newStatus) {
+    public static boolean updateAppointment(String appointmentId, String newStatus) {
 
         try (MongoClient client = MongoClients.create(URI)) {
 
@@ -623,10 +623,13 @@ public class database {
 
             if (result.getMatchedCount() == 0) {
                 System.out.println("No appointment found with ID: " + appointmentId);
+                return false;
             } else {
                 System.out.println("Appointment status updated to '" + newStatus + "' ✅");
+                return true;
             }
         }
+
     }
 
 
@@ -1024,6 +1027,41 @@ public class database {
         return doctorsList;
     }
 
+    public static MongoCollection<Document> getAppointmentCollection() {
+        MongoClient client = MongoClients.create(URI);
+        MongoDatabase database = client.getDatabase(DB_NAME);
+        return database.getCollection(APPOINTMENTS_COL);
+    }
 
+    public List<Document> getAllAppointments() {
+
+        MongoCollection<Document> collection = getAppointmentCollection();
+
+        List<Document> appointments = new ArrayList<>();
+
+        for (Document doc : collection.find()) {
+            appointments.add(doc);
+        }
+
+        return appointments;
+    }
+
+
+
+    public static String getPatientNameById(String patientId) {
+        try (MongoClient client = MongoClients.create(URI)) {
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> patients = db.getCollection(PATIENTS_COL);
+
+            Document patient = patients.find(new Document("patientId", patientId)).first();
+
+            if (patient != null) {
+                return patient.getString("name");
+            } else {
+                System.out.println("No patient found with ID: " + patientId);
+                return null;
+            }
+        }
+    }
 
 }
