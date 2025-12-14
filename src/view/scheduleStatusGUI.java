@@ -114,8 +114,8 @@ public class scheduleStatusGUI extends JFrame{
             for (Document doc : appointments) {
                 model.addRow(new Object[]{
                         doc.getString("appointmentId") != null ? doc.getString("appointmentId") : "N/A",
-                        doc.getString("patientName") != null ? doc.getString("patientName") : "N/A",
-                        doc.getString("doctorName") != null ? doc.getString("doctorName") : "N/A",
+                        doc.getString("patientId") != null ? doc.getString("patientId") : "N/A",
+                        doc.getString("doctorId") != null ? doc.getString("doctorId") : "N/A",
                         doc.getString("timeSlot") != null ? doc.getString("timeSlot") : "N/A",
                         doc.getString("reason") != null ? doc.getString("reason") : "N/A",
                         doc.getString("status") != null ? doc.getString("status") : "Pending"
@@ -134,7 +134,7 @@ public class scheduleStatusGUI extends JFrame{
         table.setModel(new DefaultTableModel(
                 new Object[][]{ },
                 new String[]{
-                        "Appointment ID", "Patient Name", "Doctor Name", "Time Slot", "Reason", "Status"
+                        "Appointment ID", "Patient ID", "Doctor ID", "Time Slot", "Reason", "Status"
                 }
         ) {
             @Override
