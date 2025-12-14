@@ -1064,4 +1064,18 @@ public class database {
         }
     }
 
+    public static List<Document> getAppointmentsByDoctorId(String doctorId) {
+        List<Document> appointmentsList = new ArrayList<>();
+
+        try (MongoClient client = MongoClients.create(URI)) {
+            MongoDatabase db = client.getDatabase(DB_NAME);
+            MongoCollection<Document> appointments = db.getCollection(APPOINTMENTS_COL);
+
+            Document filter = new Document("doctorId", doctorId);
+            appointments.find(filter).into(appointmentsList);
+        }
+
+        return appointmentsList;
+    }
+
 }
