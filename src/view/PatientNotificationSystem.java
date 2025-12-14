@@ -81,7 +81,7 @@ public class PatientNotificationSystem extends JFrame {
     private void initializeUI() {
         // Set up the main frame
         setTitle("Patient Notification System");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(1000, 700);
         setLocationRelativeTo(null); // Center the window
 

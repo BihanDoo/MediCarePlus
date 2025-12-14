@@ -247,7 +247,7 @@ public class PatientManagementForm extends JFrame {
     }
 
     // Main method to test
-    public static void main(String[] args) {
+    public static void main() {
         SwingUtilities.invokeLater(() -> {
             new PatientManagementForm().setVisible(true);
         });
