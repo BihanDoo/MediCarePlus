@@ -212,7 +212,7 @@ public class database {
         List<Document> today = getAllAppointmentNotificationsToday();
 
         if (today.isEmpty()) {
-            System.out.println("No pending appointments today 🎉");
+            System.out.println("No pending appointments today");
         } else {
             for (Document d : today) {
                 System.out.println("Appointment ID : " + d.getString("appointmentId"));
@@ -381,11 +381,7 @@ public class database {
 
             UpdateResult result = doctors.updateOne(filter, update);
 
-            if (result.getMatchedCount() == 0) {
-                System.out.println("No doctor found with ID: " + doctorId);
-            } else {
-                System.out.println("Doctor updated successfully 🩺");
-            }
+System.out.println("Doctor updated successfully");
         }
     }
 
@@ -400,11 +396,7 @@ public class database {
 
             DeleteResult result = doctors.deleteOne(filter);
 
-            if (result.getDeletedCount() == 0) {
-                System.out.println("No doctor found with ID: " + doctorId);
-            } else {
-                System.out.println("Doctor deleted successfully 🗑️");
-            }
+System.out.println("Doctor deleted successfully");
         }
     }
 
@@ -524,9 +516,7 @@ public class database {
                     .append("status", "Scheduled")
                     .append("createdAt", new Date());
 
-            appointments.insertOne(appointment);
-
-            System.out.println("Appointment scheduled successfully ✅ ID: " + appointmentId);
+            System.out.println("Appointment scheduled successfully ID: " + appointmentId);
         }
     }
 
@@ -702,7 +692,7 @@ public class database {
             appointments.insertOne(appointment);
 
             System.out.println(
-                    "Doctor assigned successfully ✅\n" + "Appointment ID: " + appointmentId + "\n" + "Doctor ID     : " + doctorId + "\n" + "Specialty     : " + specialty
+                    "Doctor assigned successfully\n" + "Appointment ID: " + appointmentId + "\n" + "Doctor ID     : " + doctorId + "\n" + "Specialty     : " + specialty
             );
         }
     }
