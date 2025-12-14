@@ -27,7 +27,7 @@ public class Book_Appointment extends JFrame {
             date = new JTextField();
             time = new JTextField();
             reason = new JTextField();
-            bookButton = new JButton("Book");
+            bookButton = new JButton("Book ");
 
             bookappointmentPane.add(new JLabel("Patient ID:"));
             bookappointmentPane.add(patientid);
