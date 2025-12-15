@@ -21,6 +21,7 @@ public class mainUI extends JFrame {
         setTitle("Admin Panel");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(760, 520);
+        setExtendedState(MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
 
         setContentPane(buildRoot());
